@@ -9,14 +9,11 @@ module AdwordsScraper
   def self.start(keyword)
     doc = fetch_serp(keyword)
     scrape_serp(doc)
-
   end
 
   def self.fetch_serp(keyword)
     url = query_url(keyword)
-
     agent = Mechanize.new
-
     # It's best to mimic a common browser or else Google may not display all ad
     # formats
     agent.user_agent = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.121 Safari/535.2'
@@ -24,18 +21,22 @@ module AdwordsScraper
   end
 
   def self.query_url(keyword)
-    'http://www.google.com/search?gcx=w&sourceid=chrome&ie=UTF-8&q='+ keyword.gsub(" ", "+")
+    'http://www.google.com/search?q='+ keyword.gsub(" ", "+")
   end
 
   def self.scrape_serp(doc)
-    container = {}	
+    container = {}
     selectors = {}
-    selectors['top'] = "#tads .vsta"
-    selectors['right'] = "#mbEnd li" # .vsra (old)
-    selectors['bottom'] = "#tadsb li"
+    # selectors['top'] = "#tads .ads-ad"
+
+    selectors['top'] = "#tads .ads-ad"  # only selector needed for 2017 design
+
+
+    # selectors['right'] = "#mbEnd li" # .vsra (old)
+    # selectors['bottom'] = "#tadsb li"
 
     selectors.each do |location, selector|
-      candidate = doc.search(selector) 
+      candidate = doc.search(selector)
       if !candidate.search('h3').empty? && candidate.size < 10 # two validations
         container[location] = candidate
       end
@@ -51,7 +52,9 @@ module AdwordsScraper
           binding.pry
         end
         position = "#{location}:#{p}"
-        ad_container << [ position, parse_ad(ad_doc) ]
+        # ad_container << [ position, parse_ad(ad_doc) ]
+        ad_container << [ parse_ad(ad_doc) ] #removed position
+
       end
     end
     ad_container
@@ -59,9 +62,8 @@ module AdwordsScraper
 
   def self.parse_ad(doc)
     container = {}
-
     desc = ''
-    d = doc.search('.ac').first.children
+    d = doc.search('.ads-creative').first.children
     d.each do |i|
       if i.name == 'br'
         desc = desc + ' '
@@ -72,21 +74,37 @@ module AdwordsScraper
     container['description'] = desc.gsub('  ', ' ')
 
     container['title'] = doc.search('h3').text # doc title text
-    container['displayurl'] = doc.search('cite').text # display URL
-    container['boxed_warning'] = doc.search('.pwl').text # boxed warning
-    container['review'] = doc.search('.f div').text # supplemental text in gray
+    container['targeturl'] = doc.search('h3 > a').attr('href').value # doc title text
 
-    redirect = doc.at_css('a')['href'].match(/.*(https?:\/\/\S+)/)[1]
-		container['redirect'] = CGI.unescape(redirect) #unescape URL encoding
+    container['displayurl'] = doc.search('h3').text # display URL
+  #   container['boxed_warning'] = doc.search('.pwl').text # boxed warning
+  #   container['review'] = doc.search('.f div').text # supplemental text in gray
 
-    sitelinks = doc.search('table a')
-    unless sitelinks.empty?
-      sitelinks_array = []
-      sitelinks.each {|i| sitelinks_array << i.text }
-      container['sitelinks'] = sitelinks_array
-    end
+  #   redirect = doc.at_css('a')['href'].match(/.*(https?:\/\/\S+)/)[1]
+		# container['redirect'] = CGI.unescape(redirect) #unescape URL encoding
 
-    container
-  end  
+  #   sitelinks = doc.search('table a')
+  #   unless sitelinks.empty?
+  #     sitelinks_array = []
+  #     sitelinks.each {|i| sitelinks_array << i.text }
+  #     container['sitelinks'] = sitelinks_array
+  #  end
+
+  container
+end
 
 end
+
+p "Enter keyword"
+print "> "
+
+keyword = gets.chomp
+
+AdwordsScraper.start(keyword).each do |result|
+  p result
+end
+
+
+
+
+
