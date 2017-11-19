@@ -29,7 +29,7 @@ module AdwordsScraper
     selectors = {}
     # selectors['top'] = "#tads .ads-ad"
 
-    selectors['top'] = "#tads .ads-ad"  # only selector needed for 2017 design
+    selectors['top'] = ".ads-ad"  # only selector needed for 2017 design
 
 
     # selectors['right'] = "#mbEnd li" # .vsra (old)
@@ -64,6 +64,7 @@ module AdwordsScraper
     container = {}
     desc = ''
     d = doc.search('.ads-creative').first.children
+
     d.each do |i|
       if i.name == 'br'
         desc = desc + ' '
@@ -71,38 +72,40 @@ module AdwordsScraper
         desc = desc + i.text
       end
     end
-    container['description'] = desc.gsub('  ', ' ')
 
     container['title'] = doc.search('h3').text # doc title text
-    container['targeturl'] = doc.search('h3 > a').attr('href').value # doc title text
+    container['description'] = desc.gsub('  ', ' ')
+    container['targeturl'] = doc.search('h3 > a ~ a').attr('href').value # doc title text
+    container['displayurl'] = doc.search('.ads-visurl > cite').text # display URL
 
-    container['displayurl'] = doc.search('h3').text # display URL
   #   container['boxed_warning'] = doc.search('.pwl').text # boxed warning
   #   container['review'] = doc.search('.f div').text # supplemental text in gray
-
   #   redirect = doc.at_css('a')['href'].match(/.*(https?:\/\/\S+)/)[1]
-		# container['redirect'] = CGI.unescape(redirect) #unescape URL encoding
-
+	# container['redirect'] = CGI.unescape(redirect) #unescape URL encoding
   #   sitelinks = doc.search('table a')
   #   unless sitelinks.empty?
   #     sitelinks_array = []
   #     sitelinks.each {|i| sitelinks_array << i.text }
   #     container['sitelinks'] = sitelinks_array
-  #  end
+  #   end
 
-  container
+   container
+ end
+
 end
 
-end
 
-p "Enter keyword"
+
+
+p "Enter keyword" # For testing
 print "> "
-
 keyword = gets.chomp
-
+p "#{AdwordsScraper.start(keyword).size} Ads found for keyword: #{keyword}"
 AdwordsScraper.start(keyword).each do |result|
   p result
 end
+
+
 
 
 
