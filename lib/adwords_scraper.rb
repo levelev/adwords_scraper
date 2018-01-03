@@ -88,6 +88,11 @@ module AdwordsScraper
       container['address'] = doc.search('._vnd').text
       container['domain'] = URI.parse(container['targeturl']).host
       domain = container['domain']
+
+      container['emails'] = []
+
+
+
       begin
 
       company = clearbit_serch_by_domain(domain)
@@ -105,6 +110,16 @@ module AdwordsScraper
 
       company.site.phoneNumbers.each do |nr|
         container['phone'] << nr
+      end
+
+      rescue => e
+      end
+
+
+      begin
+
+      company.site.emailAddresses.each do |nr|
+        container['emails'] << nr
       end
 
       rescue => e
