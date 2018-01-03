@@ -79,16 +79,38 @@ module AdwordsScraper
       container['description'] = desc.gsub('  ', ' ')
       container['targeturl'] = doc.search('h3 > a ~ a').attr('href').value # doc title text
       container['displayurl'] = doc.search('.ads-visurl > cite').text # display URL
+      container['phone'] = []
       if doc.search('._r2b').text != ""
-        container['phone'] = doc.search('._r2b').text
-      else
-        container['phone'] = doc.search('._xnd').text
+        container['phone'] << doc.search('._r2b').text
+      elsif doc.search('._xnd').text != ""
+        container['phone'] << doc.search('._xnd').text
       end
       container['address'] = doc.search('._vnd').text
       container['domain'] = URI.parse(container['targeturl']).host
       domain = container['domain']
+      begin
+
       company = clearbit_serch_by_domain(domain)
+      rescue => e
+      end
+
+
+      begin
+
       container['company_name'] = company.name
+      rescue => e
+      end
+
+      begin
+
+      company.site.phoneNumbers.each do |nr|
+        container['phone'] << nr
+      end
+
+      rescue => e
+      end
+
+      container['phone'].uniq!
 
 
 

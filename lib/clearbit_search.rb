@@ -8,7 +8,7 @@ Clearbit.key = CLEARBIT_KEY
 # p "Enter domain"
 # domain = gets.chomp
 # company = Clearbit::Enrichment::Company.find(domain: domain)
-# p company
+# p company.site.phoneNumbers.class
 
 
 def clearbit_serch_by_domain(domain)
