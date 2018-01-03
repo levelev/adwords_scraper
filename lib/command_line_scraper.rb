@@ -7,7 +7,6 @@ loop do
   break if keyword == ""
   results = AdwordsScraper.start(keyword)
   p "#{results.size} Ads found for keyword: #{keyword}"
-  counter = 1
 
   results.each_with_index do |result, index|
     p "Ad \# #{index +  1}"

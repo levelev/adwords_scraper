@@ -1,5 +1,9 @@
 require "adwords_scraper/version"
 require "mechanize"
+require 'clearbit'
+require_relative "../keys.rb"
+
+Clearbit.key = CLEARBIT_KEY
 
 module AdwordsScraper
     def self.test
@@ -83,23 +87,6 @@ module AdwordsScraper
       end
       container['address'] = doc.search('._vnd').text
       container['domain'] = URI.parse(container['targeturl']).host
-
-
-
-
-      # container['phone'] = doc.search('._xnd').text || doc.search('.ads-visurl > ._r2b').text # phone
-
-
-    #   container['boxed_warning'] = doc.search('.pwl').text # boxed warning
-    #   container['review'] = doc.search('.f div').text # supplemental text in gray
-    #   redirect = doc.at_css('a')['href'].match(/.*(https?:\/\/\S+)/)[1]
-  	#   container['redirect'] = CGI.unescape(redirect) #unescape URL encoding
-    #   sitelinks = doc.search('table a')
-    #   unless sitelinks.empty?
-    #     sitelinks_array = []
-    #     sitelinks.each {|i| sitelinks_array << i.text }
-    #     container['sitelinks'] = sitelinks_array
-    #   end
 
     container
   end
