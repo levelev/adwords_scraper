@@ -76,6 +76,19 @@ module AdwordsScraper
       container['description'] = desc.gsub('  ', ' ')
       container['targeturl'] = doc.search('h3 > a ~ a').attr('href').value # doc title text
       container['displayurl'] = doc.search('.ads-visurl > cite').text # display URL
+      if doc.search('._r2b').text != ""
+        container['phone'] = doc.search('._r2b').text
+      else
+        container['phone'] = doc.search('._xnd').text
+      end
+      container['address'] = doc.search('._vnd').text
+      container['domain'] = URI.parse(container['targeturl']).host
+
+
+
+
+      # container['phone'] = doc.search('._xnd').text || doc.search('.ads-visurl > ._r2b').text # phone
+
 
     #   container['boxed_warning'] = doc.search('.pwl').text # boxed warning
     #   container['review'] = doc.search('.f div').text # supplemental text in gray
@@ -91,12 +104,3 @@ module AdwordsScraper
     container
   end
 end
-
-
-
-
-
-
-
-
-
