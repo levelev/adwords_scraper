@@ -1,9 +1,8 @@
 require "adwords_scraper/version"
 require "mechanize"
-require 'clearbit'
-require_relative "../keys.rb"
+require_relative "clearbit_search"
 
-Clearbit.key = CLEARBIT_KEY
+
 
 module AdwordsScraper
     def self.test
@@ -87,6 +86,13 @@ module AdwordsScraper
       end
       container['address'] = doc.search('._vnd').text
       container['domain'] = URI.parse(container['targeturl']).host
+      domain = container['domain']
+      company = clearbit_serch_by_domain(domain)
+      container['company_name'] = company.name
+
+
+
+
 
     container
   end
